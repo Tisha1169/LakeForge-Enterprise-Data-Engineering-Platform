@@ -70,9 +70,20 @@ Every folder has its own `README.md` explaining its purpose in more depth.
 
 ## Getting started
 
-Local setup instructions land in Phase 4 (Docker infrastructure) — the goal is
-a single `docker compose up` bringing up the entire stack (Postgres, MinIO,
-Airflow, Spark) with sample data pre-seeded.
+```bash
+cp .env.example .env
+docker compose up -d
+```
+
+This brings up Postgres (source + warehouse), MinIO, a local Spark cluster,
+and Airflow (LocalExecutor). See [docker/README.md](docker/README.md) for the
+full service list and ports, and [docs/developer_guide.md](docs/developer_guide.md)
+for Python environment setup (`uv`) used for local (non-Docker) development.
+
+- Airflow UI: http://localhost:8080
+- MinIO console: http://localhost:9001
+
+Sample-data seeding and full source-system schemas land in Phase 5.
 
 ## Project status
 

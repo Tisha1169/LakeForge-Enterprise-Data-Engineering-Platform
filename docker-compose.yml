@@ -1,0 +1,203 @@
+x-airflow-common: &airflow-common
+  build:
+    context: .
+    dockerfile: docker/airflow/Dockerfile
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__FERNET_KEY: ""
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
+    OPENLAKE_ENV: ${OPENLAKE_ENV:-local}
+    SOURCE_DB_HOST: postgres-source
+    SOURCE_DB_PORT: 5432
+    SOURCE_DB_NAME: ${SOURCE_DB_NAME:-openlake_source}
+    SOURCE_DB_USER: ${SOURCE_DB_USER:-openlake}
+    SOURCE_DB_PASSWORD: ${SOURCE_DB_PASSWORD:-changeme}
+    WAREHOUSE_DB_HOST: postgres-warehouse
+    WAREHOUSE_DB_PORT: 5432
+    WAREHOUSE_DB_NAME: ${WAREHOUSE_DB_NAME:-openlake_warehouse}
+    WAREHOUSE_DB_USER: ${WAREHOUSE_DB_USER:-openlake}
+    WAREHOUSE_DB_PASSWORD: ${WAREHOUSE_DB_PASSWORD:-changeme}
+    MINIO_ENDPOINT: minio:9000
+    MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-openlake}
+    MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-changeme123}
+    MINIO_SECURE: "false"
+    CUSTOMER_API_BASE_URL: ${CUSTOMER_API_BASE_URL:-http://localhost:8080}
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  volumes:
+    - ./airflow/dags:/opt/airflow/dags
+    - ./airflow/plugins:/opt/airflow/plugins
+    - ./airflow/logs:/opt/airflow/logs
+    - ./pipelines:/opt/airflow/pipelines
+    - ./config:/opt/airflow/config
+    - ./metadata:/opt/airflow/metadata
+    - ./monitoring:/opt/airflow/monitoring
+    - ./sample_data:/opt/airflow/sample_data
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on: &airflow-common-depends-on
+    postgres-airflow:
+      condition: service_healthy
+
+services:
+  postgres-source:
+    image: postgres:16-alpine
+    container_name: openlake-postgres-source
+    environment:
+      POSTGRES_DB: ${SOURCE_DB_NAME:-openlake_source}
+      POSTGRES_USER: ${SOURCE_DB_USER:-openlake}
+      POSTGRES_PASSWORD: ${SOURCE_DB_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_source_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-source:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SOURCE_DB_USER:-openlake} -d ${SOURCE_DB_NAME:-openlake_source}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres-warehouse:
+    image: postgres:16-alpine
+    container_name: openlake-postgres-warehouse
+    environment:
+      POSTGRES_DB: ${WAREHOUSE_DB_NAME:-openlake_warehouse}
+      POSTGRES_USER: ${WAREHOUSE_DB_USER:-openlake}
+      POSTGRES_PASSWORD: ${WAREHOUSE_DB_PASSWORD:-changeme}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_warehouse_data:/var/lib/postgresql/data
+      - ./docker/postgres/init-warehouse:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${WAREHOUSE_DB_USER:-openlake} -d ${WAREHOUSE_DB_NAME:-openlake_warehouse}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres-airflow:
+    image: postgres:16-alpine
+    container_name: openlake-postgres-airflow
+    environment:
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    volumes:
+      - postgres_airflow_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: openlake-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-openlake}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-changeme123}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: openlake-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "/init-buckets.sh"]
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-openlake}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-changeme123}
+      MINIO_BUCKET_LANDING: ${MINIO_BUCKET_LANDING:-openlake-landing}
+      MINIO_BUCKET_BRONZE: ${MINIO_BUCKET_BRONZE:-openlake-bronze}
+      MINIO_BUCKET_SILVER: ${MINIO_BUCKET_SILVER:-openlake-silver}
+      MINIO_BUCKET_GOLD: ${MINIO_BUCKET_GOLD:-openlake-gold}
+    volumes:
+      - ./docker/minio/init-buckets.sh:/init-buckets.sh:ro
+
+  spark-master:
+    build:
+      context: .
+      dockerfile: docker/spark/Dockerfile
+    container_name: openlake-spark-master
+    environment:
+      SPARK_MODE: master
+    ports:
+      - "7077:7077"
+      - "8081:8080"
+    volumes:
+      - ./spark:/opt/spark-jobs
+
+  spark-worker:
+    build:
+      context: .
+      dockerfile: docker/spark/Dockerfile
+    container_name: openlake-spark-worker
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+      SPARK_WORKER_CORES: "2"
+      SPARK_WORKER_MEMORY: 2G
+    depends_on:
+      - spark-master
+    volumes:
+      - ./spark:/opt/spark-jobs
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: openlake-airflow-init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate
+        airflow users create \
+          --username "${AIRFLOW_ADMIN_USER:-admin}" \
+          --password "${AIRFLOW_ADMIN_PASSWORD:-admin}" \
+          --firstname OpenLake \
+          --lastname Admin \
+          --role Admin \
+          --email admin@openlake.local || true
+    depends_on: *airflow-common-depends-on
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: openlake-airflow-webserver
+    command: webserver
+    ports:
+      - "8080:8080"
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: openlake-airflow-scheduler
+    command: scheduler
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+volumes:
+  postgres_source_data:
+  postgres_warehouse_data:
+  postgres_airflow_data:
+  minio_data:
