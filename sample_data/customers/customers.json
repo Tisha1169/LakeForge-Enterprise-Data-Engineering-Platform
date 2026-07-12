@@ -1,0 +1,470 @@
+[
+  {
+    "customer_id": 1,
+    "email": "apicustomer1@example.com",
+    "first_name": "Fatima",
+    "last_name": "Johnson",
+    "signup_date": "2023-02-02",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0101"
+  },
+  {
+    "customer_id": 2,
+    "email": "apicustomer2@example.com",
+    "first_name": "Diego",
+    "last_name": "Garcia",
+    "signup_date": "2023-03-03",
+    "loyalty_tier": "silver",
+    "phone": "+1-555-0102"
+  },
+  {
+    "customer_id": 3,
+    "email": "apicustomer3@example.com",
+    "first_name": "Taylor",
+    "last_name": "Lee",
+    "signup_date": "2023-04-04",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0103"
+  },
+  {
+    "customer_id": 4,
+    "email": "apicustomer4@example.com",
+    "first_name": "Fatima",
+    "last_name": "Rossi",
+    "signup_date": "2023-05-05",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0104"
+  },
+  {
+    "customer_id": 5,
+    "email": "apicustomer5@example.com",
+    "first_name": "Wei",
+    "last_name": "Miller",
+    "signup_date": "2023-06-06",
+    "loyalty_tier": "bronze",
+    "phone": null
+  },
+  {
+    "customer_id": 6,
+    "email": "apicustomer6@example.com",
+    "first_name": "Alex",
+    "last_name": "Johnson",
+    "signup_date": "2023-07-07",
+    "loyalty_tier": "silver",
+    "phone": "+1-555-0106"
+  },
+  {
+    "customer_id": 7,
+    "email": "apicustomer7@example.com",
+    "first_name": "Taylor",
+    "last_name": "Patel",
+    "signup_date": "2023-08-08",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0107"
+  },
+  {
+    "customer_id": 8,
+    "email": "apicustomer8@example.com",
+    "first_name": "Priya",
+    "last_name": "Brown",
+    "signup_date": "2023-09-09",
+    "loyalty_tier": "platinum",
+    "phone": "+1-555-0108"
+  },
+  {
+    "customer_id": 9,
+    "email": "apicustomer9@example.com",
+    "first_name": "Taylor",
+    "last_name": "Wilson",
+    "signup_date": "2023-10-10",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0109"
+  },
+  {
+    "customer_id": 10,
+    "email": "apicustomer10@example.com",
+    "first_name": "Alex",
+    "last_name": "Lee",
+    "signup_date": "2023-11-11",
+    "loyalty_tier": "platinum",
+    "phone": null
+  },
+  {
+    "customer_id": 11,
+    "email": "apicustomer11@example.com",
+    "first_name": "Casey",
+    "last_name": "Garcia",
+    "signup_date": "2023-12-12",
+    "loyalty_tier": "silver",
+    "phone": "+1-555-0111"
+  },
+  {
+    "customer_id": 12,
+    "email": "apicustomer12@example.com",
+    "first_name": "Taylor",
+    "last_name": "Davis",
+    "signup_date": "2023-01-13",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0112"
+  },
+  {
+    "customer_id": 13,
+    "email": "apicustomer13@example.com",
+    "first_name": "Jordan",
+    "last_name": "Miller",
+    "signup_date": "2023-02-14",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0113"
+  },
+  {
+    "customer_id": 14,
+    "email": "apicustomer14@example.com",
+    "first_name": "Casey",
+    "last_name": "Davis",
+    "signup_date": "2023-03-15",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0114"
+  },
+  {
+    "customer_id": 15,
+    "email": "apicustomer15@example.com",
+    "first_name": "Alex",
+    "last_name": "Rossi",
+    "signup_date": "2023-04-16",
+    "loyalty_tier": "platinum",
+    "phone": null
+  },
+  {
+    "customer_id": 16,
+    "email": "apicustomer16@example.com",
+    "first_name": "Priya",
+    "last_name": "Johnson",
+    "signup_date": "2023-05-17",
+    "loyalty_tier": "platinum",
+    "phone": "+1-555-0116"
+  },
+  {
+    "customer_id": 17,
+    "email": "apicustomer17@example.com",
+    "first_name": "Jordan",
+    "last_name": "Patel",
+    "signup_date": "2023-06-18",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0117"
+  },
+  {
+    "customer_id": 18,
+    "email": "apicustomer18@example.com",
+    "first_name": "Fatima",
+    "last_name": "Chen",
+    "signup_date": "2023-07-19",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0118"
+  },
+  {
+    "customer_id": 19,
+    "email": "apicustomer19@example.com",
+    "first_name": "Wei",
+    "last_name": "Brown",
+    "signup_date": "2023-08-20",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0119"
+  },
+  {
+    "customer_id": 20,
+    "email": "apicustomer20@example.com",
+    "first_name": "Alex",
+    "last_name": "Khan",
+    "signup_date": "2023-09-21",
+    "loyalty_tier": "silver",
+    "phone": null
+  },
+  {
+    "customer_id": 21,
+    "email": "apicustomer21@example.com",
+    "first_name": "Morgan",
+    "last_name": "Johnson",
+    "signup_date": "2023-10-22",
+    "loyalty_tier": "silver",
+    "phone": "+1-555-0121"
+  },
+  {
+    "customer_id": 22,
+    "email": "apicustomer22@example.com",
+    "first_name": "Jordan",
+    "last_name": "Miller",
+    "signup_date": "2023-11-23",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0122"
+  },
+  {
+    "customer_id": 23,
+    "email": "apicustomer23@example.com",
+    "first_name": "Jamie",
+    "last_name": "Khan",
+    "signup_date": "2023-12-24",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0123"
+  },
+  {
+    "customer_id": 24,
+    "email": "apicustomer24@example.com",
+    "first_name": "Sam",
+    "last_name": "Davis",
+    "signup_date": "2023-01-25",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0124"
+  },
+  {
+    "customer_id": 25,
+    "email": "apicustomer25@example.com",
+    "first_name": "Taylor",
+    "last_name": "Khan",
+    "signup_date": "2023-02-26",
+    "loyalty_tier": "gold",
+    "phone": null
+  },
+  {
+    "customer_id": 26,
+    "email": "apicustomer26@example.com",
+    "first_name": "Diego",
+    "last_name": "Khan",
+    "signup_date": "2023-03-27",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0126"
+  },
+  {
+    "customer_id": 27,
+    "email": "apicustomer27@example.com",
+    "first_name": "Wei",
+    "last_name": "Khan",
+    "signup_date": "2023-04-28",
+    "loyalty_tier": "silver",
+    "phone": "+1-555-0127"
+  },
+  {
+    "customer_id": 28,
+    "email": "apicustomer28@example.com",
+    "first_name": "Priya",
+    "last_name": "Rossi",
+    "signup_date": "2023-05-01",
+    "loyalty_tier": "silver",
+    "phone": "+1-555-0128"
+  },
+  {
+    "customer_id": 29,
+    "email": "apicustomer29@example.com",
+    "first_name": "Sam",
+    "last_name": "Wilson",
+    "signup_date": "2023-06-02",
+    "loyalty_tier": "platinum",
+    "phone": "+1-555-0129"
+  },
+  {
+    "customer_id": 30,
+    "email": "apicustomer30@example.com",
+    "first_name": "Morgan",
+    "last_name": "Khan",
+    "signup_date": "2023-07-03",
+    "loyalty_tier": "silver",
+    "phone": null
+  },
+  {
+    "customer_id": 31,
+    "email": "apicustomer31@example.com",
+    "first_name": "Fatima",
+    "last_name": "Davis",
+    "signup_date": "2023-08-04",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0131"
+  },
+  {
+    "customer_id": 32,
+    "email": "apicustomer32@example.com",
+    "first_name": "Taylor",
+    "last_name": "Smith",
+    "signup_date": "2023-09-05",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0132"
+  },
+  {
+    "customer_id": 33,
+    "email": "apicustomer33@example.com",
+    "first_name": "Riley",
+    "last_name": "Garcia",
+    "signup_date": "2023-10-06",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0133"
+  },
+  {
+    "customer_id": 34,
+    "email": "apicustomer34@example.com",
+    "first_name": "Taylor",
+    "last_name": "Chen",
+    "signup_date": "2023-11-07",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0134"
+  },
+  {
+    "customer_id": 35,
+    "email": "apicustomer35@example.com",
+    "first_name": "Taylor",
+    "last_name": "Khan",
+    "signup_date": "2023-12-08",
+    "loyalty_tier": "platinum",
+    "phone": null
+  },
+  {
+    "customer_id": 36,
+    "email": "apicustomer36@example.com",
+    "first_name": "Riley",
+    "last_name": "Khan",
+    "signup_date": "2023-01-09",
+    "loyalty_tier": "platinum",
+    "phone": "+1-555-0136"
+  },
+  {
+    "customer_id": 37,
+    "email": "apicustomer37@example.com",
+    "first_name": "Sam",
+    "last_name": "Garcia",
+    "signup_date": "2023-02-10",
+    "loyalty_tier": "silver",
+    "phone": "+1-555-0137"
+  },
+  {
+    "customer_id": 38,
+    "email": "apicustomer38@example.com",
+    "first_name": "Taylor",
+    "last_name": "Rossi",
+    "signup_date": "2023-03-11",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0138"
+  },
+  {
+    "customer_id": 39,
+    "email": "apicustomer39@example.com",
+    "first_name": "Diego",
+    "last_name": "Chen",
+    "signup_date": "2023-04-12",
+    "loyalty_tier": "platinum",
+    "phone": "+1-555-0139"
+  },
+  {
+    "customer_id": 40,
+    "email": "apicustomer40@example.com",
+    "first_name": "Wei",
+    "last_name": "Miller",
+    "signup_date": "2023-05-13",
+    "loyalty_tier": "gold",
+    "phone": null
+  },
+  {
+    "customer_id": 41,
+    "email": "apicustomer41@example.com",
+    "first_name": "Taylor",
+    "last_name": "Lee",
+    "signup_date": "2023-06-14",
+    "loyalty_tier": "platinum",
+    "phone": "+1-555-0141"
+  },
+  {
+    "customer_id": 42,
+    "email": "apicustomer42@example.com",
+    "first_name": "Jordan",
+    "last_name": "Smith",
+    "signup_date": "2023-07-15",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0142"
+  },
+  {
+    "customer_id": 43,
+    "email": "apicustomer43@example.com",
+    "first_name": "Sam",
+    "last_name": "Khan",
+    "signup_date": "2023-08-16",
+    "loyalty_tier": "silver",
+    "phone": "+1-555-0143"
+  },
+  {
+    "customer_id": 44,
+    "email": "apicustomer44@example.com",
+    "first_name": "Fatima",
+    "last_name": "Miller",
+    "signup_date": "2023-09-17",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0144"
+  },
+  {
+    "customer_id": 45,
+    "email": "apicustomer45@example.com",
+    "first_name": "Riley",
+    "last_name": "Miller",
+    "signup_date": "2023-10-18",
+    "loyalty_tier": "platinum",
+    "phone": null
+  },
+  {
+    "customer_id": 46,
+    "email": "apicustomer46@example.com",
+    "first_name": "Priya",
+    "last_name": "Garcia",
+    "signup_date": "2023-11-19",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0146"
+  },
+  {
+    "customer_id": 47,
+    "email": "apicustomer47@example.com",
+    "first_name": "Fatima",
+    "last_name": "Rossi",
+    "signup_date": "2023-12-20",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0147"
+  },
+  {
+    "customer_id": 48,
+    "email": "apicustomer48@example.com",
+    "first_name": "Fatima",
+    "last_name": "Patel",
+    "signup_date": "2023-01-21",
+    "loyalty_tier": "gold",
+    "phone": "+1-555-0148"
+  },
+  {
+    "customer_id": 49,
+    "email": "apicustomer49@example.com",
+    "first_name": "Fatima",
+    "last_name": "Davis",
+    "signup_date": "2023-02-22",
+    "loyalty_tier": "bronze",
+    "phone": "+1-555-0149"
+  },
+  {
+    "customer_id": 50,
+    "email": "apicustomer50@example.com",
+    "first_name": "Morgan",
+    "last_name": "Miller",
+    "signup_date": "2023-03-23",
+    "loyalty_tier": "silver",
+    "phone": null
+  },
+  {
+    "customer_id": 51,
+    "email": null,
+    "first_name": "Pat",
+    "last_name": "Nguyen",
+    "signup_date": "2024/04/01",
+    "loyalty_tier": "gold",
+    "phone": null
+  },
+  {
+    "customer_id": 52,
+    "email": "apicustomer5@example.com",
+    "first_name": "Dana",
+    "last_name": "Kim",
+    "signup_date": "04-11-2024",
+    "loyalty_tier": "silver",
+    "phone": "+1-555-0199"
+  }
+]

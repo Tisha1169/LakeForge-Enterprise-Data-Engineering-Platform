@@ -1,0 +1,13 @@
+supplier_id,supplier_name,product_sku,unit_cost,lead_time_days,updated_at
+1,Global Office Supply Co,SKU-107,4.20,7,2024-01-02
+1,Global Office Supply Co,SKU-108,2.10,7,2024-01-02
+2,TechParts Direct,SKU-101,9.75,21,2024-01-03
+2,TechParts Direct,SKU-102,32.00,21,2024-01-03
+2,TechParts Direct,SKU-103,14.50,21,
+2,TechParts Direct,SKU-113,18.00,21,2024-01-03
+3,Nordic Furnishings,SKU-104,210.00,14,01/03/2024
+3,Nordic Furnishings,SKU-105,95.00,14,01/03/2024
+3,Nordic Furnishings,SKU-106,11.00,14,01/03/2024
+4,Pacific Trading Ltd,SKU-111,28.00,18,2024-01-04
+4,Pacific Trading Ltd,SKU-112,10.50,18,2024-01-04
+4,Pacific Trading Ltd,,6.00,18,2024-01-04

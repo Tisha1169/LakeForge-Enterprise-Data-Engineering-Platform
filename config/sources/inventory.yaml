@@ -1,0 +1,10 @@
+name: inventory
+source_type: db
+description: Daily stock snapshots extracted from the operational Inventory Postgres DB.
+schedule: "@daily"
+schema_name: inventory
+table: stock_snapshots
+retry:
+  max_attempts: 3
+  initial_backoff_seconds: 2.0
+  max_backoff_seconds: 20.0

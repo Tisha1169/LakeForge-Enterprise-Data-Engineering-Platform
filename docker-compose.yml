@@ -23,7 +23,7 @@ x-airflow-common: &airflow-common
     MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-openlake}
     MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-changeme123}
     MINIO_SECURE: "false"
-    CUSTOMER_API_BASE_URL: ${CUSTOMER_API_BASE_URL:-http://localhost:8080}
+    CUSTOMER_API_BASE_URL: http://customer-api:8080
     LOG_LEVEL: ${LOG_LEVEL:-INFO}
   volumes:
     - ./airflow/dags:/opt/airflow/dags
@@ -125,6 +125,21 @@ services:
       MINIO_BUCKET_GOLD: ${MINIO_BUCKET_GOLD:-openlake-gold}
     volumes:
       - ./docker/minio/init-buckets.sh:/init-buckets.sh:ro
+
+  customer-api:
+    build:
+      context: .
+      dockerfile: docker/customer-api/Dockerfile
+    container_name: openlake-customer-api
+    ports:
+      - "8000:8080"
+    volumes:
+      - ./sample_data/customers/customers.json:/data/customers.json:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   spark-master:
     build:

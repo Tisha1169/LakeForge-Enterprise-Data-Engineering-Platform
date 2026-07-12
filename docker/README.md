@@ -21,6 +21,11 @@ manual setup steps.
   interpreter version.
 - `spark/Dockerfile` — extends the Bitnami Spark image with the Python deps
   our PySpark jobs need; used for both `spark-master` and `spark-worker`.
+- `customer-api/` — a small FastAPI service simulating the Customer REST API
+  for local dev: paginated `/customers`, seeded from
+  `sample_data/customers/customers.json`. Exists so ingestion genuinely
+  exercises HTTP pagination/retry against something that behaves like a real
+  third-party API, not a local file read.
 
 ## Services (root `docker-compose.yml`)
 
@@ -30,6 +35,7 @@ manual setup steps.
 | `postgres-warehouse` | Warehouse + metadata schema (host port 5433) |
 | `postgres-airflow` | Airflow's internal metadata DB — kept separate from business data |
 | `minio` / `minio-init` | Object storage (console on host port 9001) + bucket bootstrap |
+| `customer-api` | Mock Customer REST API (host port 8000, container port 8080) |
 | `spark-master` / `spark-worker` | Local Spark cluster for PySpark jobs |
 | `airflow-init` / `airflow-webserver` / `airflow-scheduler` | LocalExecutor Airflow (UI on host port 8080) |
 

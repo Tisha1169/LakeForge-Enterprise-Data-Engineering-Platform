@@ -1,0 +1,10 @@
+name: sales
+source_type: db
+description: Sales orders and order lines extracted from the operational Sales Postgres DB.
+schedule: "@daily"
+schema_name: sales
+table: orders
+retry:
+  max_attempts: 3
+  initial_backoff_seconds: 2.0
+  max_backoff_seconds: 20.0

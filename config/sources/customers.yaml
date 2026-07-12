@@ -1,0 +1,10 @@
+name: customers
+source_type: api
+description: Customer records pulled from the Customer API (mock service in local dev).
+schedule: "@daily"
+endpoint: /customers
+page_size: 100
+retry:
+  max_attempts: 4
+  initial_backoff_seconds: 1.0
+  max_backoff_seconds: 15.0

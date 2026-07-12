@@ -4,9 +4,22 @@ Core Python business logic for the platform, organized by medallion layer.
 Airflow DAGs call into this package; this package has no Airflow dependency
 itself, so it is independently unit-testable (see `tests/`).
 
-- `ingestion/` — pulls data from source systems into the MinIO landing zone.
-  Subfolders per source type: `api/` (Customer API), `db/` (Sales, Inventory
-  Postgres extraction), `files/` (Supplier CSV drop).
+- `ingestion/` — pulls data from source systems into the MinIO landing zone
+  as NDJSON, regardless of source format. `base.py` holds the shared
+  lifecycle (`BaseIngestion.run()`: extract -> land -> report); subclasses
+  only implement `extract()`:
+  - `api/customer_api.py` — paginated HTTP pull from the Customer API, retry
+    (tenacity, exponential backoff) on connection errors/timeouts/5xx only —
+    a 4xx fails fast, it's not transient.
+  - `db/table_extract.py` — generic full-table extraction from the source
+    Postgres, used for both Sales and Inventory (config-driven, not
+    source-specific code); connection retry on `OperationalError`.
+  - `files/supplier_files.py` — reads every file matching a glob in the
+    configured drop directory (a real SFTP/file-share drop in production,
+    `sample_data/suppliers/` locally).
+  Each source is declared in `config/sources/*.yaml` and loaded via
+  `config/sources.py`'s `SourceConfig` — adding a source means adding YAML,
+  not new ingestion logic (beyond a new transport type, which is rare).
 - `bronze/` — lands raw ingested data as immutable, partitioned Parquet with
   metadata capture. No transformation.
 - `silver/` — thin orchestration around the PySpark jobs in `spark/jobs/`

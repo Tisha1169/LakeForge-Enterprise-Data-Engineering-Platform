@@ -1,0 +1,10 @@
+name: suppliers
+source_type: file
+description: Weekly supplier catalog CSV drop.
+schedule: "@weekly"
+directory: sample_data/suppliers
+file_pattern: "*.csv"
+retry:
+  max_attempts: 2
+  initial_backoff_seconds: 1.0
+  max_backoff_seconds: 5.0
