@@ -4,10 +4,14 @@ Containerization for every service in the platform. The goal: `docker compose
 up` brings up the entire stack — Postgres, MinIO, Airflow, Spark — with no
 manual setup steps.
 
-- `postgres/init-source/` — SQL run on first boot of `postgres-source`
-  (extensions now; full source-system schema + seed data in Phase 5).
-- `postgres/init-warehouse/` — SQL run on first boot of `postgres-warehouse`
-  (extensions now; warehouse + metadata schema in Phase 5 / Phase 15).
+- `postgres/init-source/` — SQL run on first boot of `postgres-source`:
+  extensions, the `sales` schema (stores, products, customers, orders,
+  order_lines) and `inventory` schema (stock_snapshots, suppliers), plus
+  synthetic seed data (deliberately includes some nulls/dirty rows for
+  Silver-layer cleaning to handle later).
+- `postgres/init-warehouse/` — SQL run on first boot of `postgres-warehouse`:
+  extensions, plus the `gold` and `metadata` schemas reserved (tables land
+  in Phase 10/13 and Phase 15 respectively).
 - `minio/init-buckets.sh` — idempotent script (run by the `minio-init`
   one-shot container) that creates the landing/bronze/silver/gold buckets.
 - `airflow/Dockerfile` — extends the official Airflow image with the
