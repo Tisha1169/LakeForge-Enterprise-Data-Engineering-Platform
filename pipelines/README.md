@@ -20,8 +20,15 @@ itself, so it is independently unit-testable (see `tests/`).
   Each source is declared in `config/sources/*.yaml` and loaded via
   `config/sources.py`'s `SourceConfig` — adding a source means adding YAML,
   not new ingestion logic (beyond a new transport type, which is rare).
-- `bronze/` — lands raw ingested data as immutable, partitioned Parquet with
-  metadata capture. No transformation.
+- `bronze/` — converts landing NDJSON into immutable, `batch_date`-partitioned
+  Parquet. `writer.py` stores each raw record as a JSON string in a
+  `payload` column (plus typed `_ingested_at`/`_source_file`/`_batch_date`
+  technical columns) rather than flattening fields into typed Arrow columns
+  — schema-on-read, so a field that's an int in one row and a string in
+  another (real schema drift) never breaks the write. `reader.py` parses
+  `payload` back into a flat dict for Silver/tooling to consume. Re-running
+  for the same `(source, table, batch_date)` overwrites that partition
+  (idempotent); no cleaning/casting/validation happens here — that's Silver.
 - `silver/` — thin orchestration around the PySpark jobs in `spark/jobs/`
   (job submission, parameter resolution) — the transformation logic itself
   lives in `spark/`.
