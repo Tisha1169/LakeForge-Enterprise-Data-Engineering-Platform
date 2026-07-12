@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Airflow
+airflow/logs/
+airflow/airflow.db
+airflow/airflow.cfg
+airflow/webserver_config.py
+
+# Spark
+spark-warehouse/
+derby.log
+metastore_db/
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+# Great Expectations
+great_expectations/uncommitted/
+
+# Data (never commit real/large data)
+**/data/
+*.parquet
+*.duckdb
+
+# MinIO local volumes
+docker/minio/data/
+docker/postgres/data/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Claude Code local settings
+.claude/
+
+# Terraform (future cloud phase)
+*.tfstate
+*.tfstate.*
+.terraform/
