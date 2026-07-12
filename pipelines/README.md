@@ -29,9 +29,10 @@ itself, so it is independently unit-testable (see `tests/`).
   `payload` back into a flat dict for Silver/tooling to consume. Re-running
   for the same `(source, table, batch_date)` overwrites that partition
   (idempotent); no cleaning/casting/validation happens here — that's Silver.
-- `silver/` — thin orchestration around the PySpark jobs in `spark/jobs/`
-  (job submission, parameter resolution) — the transformation logic itself
-  lives in `spark/`.
+- `silver/` — thin orchestration around the PySpark jobs in `spark/jobs/`.
+  `runner.py`'s `run_silver_job(job_name, batch_date)` looks up and calls the
+  right job module — the cleaning/casting/dedup logic itself lives in
+  `spark/jobs/` (see `spark/README.md`).
 - `gold/` — thin orchestration around dbt runs (invoking `dbt run`/`dbt
   test` for the relevant model selection) — the transformation logic itself
   lives in `dbt/`.

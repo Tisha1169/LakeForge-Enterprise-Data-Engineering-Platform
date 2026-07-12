@@ -15,6 +15,6 @@ def test_load_source_config_sales():
     assert config.table == "orders"
 
 
-def test_list_source_configs_finds_all_four():
+def test_list_source_configs_finds_all_five():
     names = {c.name for c in list_source_configs()}
-    assert names == {"customers", "sales", "inventory", "suppliers"}
+    assert names == {"customers", "sales", "sales_order_lines", "inventory", "suppliers"}
