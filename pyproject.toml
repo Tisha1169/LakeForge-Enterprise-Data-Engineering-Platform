@@ -39,6 +39,7 @@ dev = [
     "pytest>=8.3",
     "pytest-cov>=5.0",
     "pytest-mock>=3.14",
+    "moto[s3]>=5.0",
     "ruff>=0.6",
     "mypy>=1.11",
     "pre-commit>=3.8",
