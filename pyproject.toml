@@ -75,7 +75,7 @@ disallow_untyped_defs = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=pipelines --cov=metadata --cov=monitoring --cov=config --cov-report=term-missing --cov-report=html"
+addopts = "--cov=pipelines --cov=metadata --cov=monitoring --cov=config --cov=data_quality --cov=spark --cov-report=term-missing --cov-report=html --cov-fail-under=80"
 
 [tool.coverage.run]
 branch = true
