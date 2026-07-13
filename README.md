@@ -84,13 +84,24 @@ for Python environment setup (`uv`) used for local (non-Docker) development.
 - Airflow UI: http://localhost:8080
 - MinIO console: http://localhost:9001
 
-Sample-data seeding and full source-system schemas land in Phase 5.
+Sample-data seeding and full source-system schemas are provisioned
+automatically on first boot — see `docker/postgres/init-source/`.
+
+## Documentation
+
+- [Architecture](docs/architecture.md) — design decisions and rationale
+- [Pipeline flow](docs/pipelines.md) — which DAG runs what, calling which code
+- [Developer guide](docs/developer_guide.md) — local setup, adding a source/table
+- [Deployment guide](docs/deployment_guide.md) — moving to a real cloud environment
+- [Data dictionary](docs/data_dictionary.md) — Silver/Gold table and column reference
+- [Interview notes](docs/interview_notes.md) — talking points, resume bullets, real bugs found
 
 ## Project status
 
 Built in 20 phases (see [docs/architecture.md](docs/architecture.md) for the
 full roadmap), from architecture through ingestion, Bronze/Silver/Gold,
-orchestration, data quality, metadata, testing, documentation, and CI/CD.
+orchestration, PySpark performance tuning, dbt, data quality, metadata,
+monitoring, testing, and documentation — CI/CD and final optimization next.
 
 ## License
 

@@ -1,9 +1,24 @@
 # docs/
 
-Project documentation, expanded through later phases:
+- [`architecture.md`](architecture.md) — system design, medallion data flow,
+  and the rationale behind every major decision (storage format, object
+  store, orchestrator, why two Gold implementations exist, cloud
+  portability).
+- [`pipelines.md`](pipelines.md) — "follow the data": which DAG runs what,
+  in what order, calling which code. Start here if you want to trace a
+  batch through the whole system.
+- [`developer_guide.md`](developer_guide.md) — local setup, running the
+  full platform, adding a new source/Silver table/Gold table, code
+  conventions.
+- [`deployment_guide.md`](deployment_guide.md) — moving from local Docker
+  Compose to a real cloud environment (AWS/Azure/GCP), component by
+  component.
+- [`data_dictionary.md`](data_dictionary.md) — table/column definitions for
+  the Silver and Gold layers.
+- [`interview_notes.md`](interview_notes.md) — recruiter talking points,
+  resume bullets, and (the most useful section) a list of real bugs found
+  and fixed while building this, with root causes and fixes.
 
-- `architecture.md` — system design, data flow, key decisions (Phase 1, this file's sibling).
-- `developer_guide.md` — local setup, running pipelines, adding a new source (Phase 18).
-- `deployment_guide.md` — how to move from local Docker to a cloud environment (Phase 18).
-- `data_dictionary.md` — table/column definitions for Silver and Gold layers (Phase 18).
-- `interview_notes.md` — accumulated interview Q&A and resume bullets generated after each phase.
+Every folder in the repo also has its own `README.md` with implementation
+detail specific to that layer — the docs here are cross-cutting; the
+per-folder READMEs are the deep reference.
