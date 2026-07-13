@@ -209,6 +209,31 @@ def get_ownership(engine: Engine, layer: str, table_name: str) -> dict | None:
     return dict(row) if row else None
 
 
+def list_recent_failed_runs(
+    engine: Engine, layer: str, table_name: str, since: datetime
+) -> list[dict]:
+    """Used by monitoring/health.py — a table can look "fresh" (a successful
+    run happened recently) while also having had failures in between; both
+    facts matter for health status, so this is a separate query rather than
+    folded into get_freshness."""
+    with _connectable(engine).connect() as conn:
+        rows = (
+            conn.execute(
+                select(pipeline_runs)
+                .where(
+                    (pipeline_runs.c.layer == layer)
+                    & (pipeline_runs.c.table_name == table_name)
+                    & (pipeline_runs.c.status == "failed")
+                    & (pipeline_runs.c.started_at >= since)
+                )
+                .order_by(pipeline_runs.c.started_at.desc())
+            )
+            .mappings()
+            .all()
+        )
+    return [dict(r) for r in rows]
+
+
 @dataclass
 class RunHandle:
     run_id: str
