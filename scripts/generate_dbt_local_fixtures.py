@@ -109,23 +109,81 @@ def generate(base: Path, customers_batch_date: str) -> None:
     _write(base, "sales", "orders", "2024-01-11", orders)
 
     order_lines = [
-        {"order_line_id": 1, "order_id": 100, "product_id": 101, "quantity": 2, "unit_price": 24.99, "discount_pct": 0},
-        {"order_line_id": 2, "order_id": 100, "product_id": 102, "quantity": 1, "unit_price": 79.99, "discount_pct": 10},
-        {"order_line_id": 3, "order_id": 101, "product_id": 101, "quantity": 1, "unit_price": 24.99, "discount_pct": 0},
-        {"order_line_id": 4, "order_id": 102, "product_id": 103, "quantity": 3, "unit_price": 34.50, "discount_pct": 0},
+        {
+            "order_line_id": 1,
+            "order_id": 100,
+            "product_id": 101,
+            "quantity": 2,
+            "unit_price": 24.99,
+            "discount_pct": 0,
+        },
+        {
+            "order_line_id": 2,
+            "order_id": 100,
+            "product_id": 102,
+            "quantity": 1,
+            "unit_price": 79.99,
+            "discount_pct": 10,
+        },
+        {
+            "order_line_id": 3,
+            "order_id": 101,
+            "product_id": 101,
+            "quantity": 1,
+            "unit_price": 24.99,
+            "discount_pct": 0,
+        },
+        {
+            "order_line_id": 4,
+            "order_id": 102,
+            "product_id": 103,
+            "quantity": 3,
+            "unit_price": 34.50,
+            "discount_pct": 0,
+        },
     ]
     _write(base, "sales_order_lines", "order_lines", "2024-01-11", order_lines)
 
     products = [
-        {"product_id": 101, "sku": "SKU-101", "product_name": "Wireless Mouse", "category": "Electronics", "unit_price": 24.99},
-        {"product_id": 102, "sku": "SKU-102", "product_name": "Mechanical Keyboard", "category": "Electronics", "unit_price": 79.99},
-        {"product_id": 103, "sku": "SKU-103", "product_name": "USB-C Hub", "category": "Electronics", "unit_price": 34.50},
+        {
+            "product_id": 101,
+            "sku": "SKU-101",
+            "product_name": "Wireless Mouse",
+            "category": "Electronics",
+            "unit_price": 24.99,
+        },
+        {
+            "product_id": 102,
+            "sku": "SKU-102",
+            "product_name": "Mechanical Keyboard",
+            "category": "Electronics",
+            "unit_price": 79.99,
+        },
+        {
+            "product_id": 103,
+            "sku": "SKU-103",
+            "product_name": "USB-C Hub",
+            "category": "Electronics",
+            "unit_price": 34.50,
+        },
     ]
     _write(base, "sales_products", "products", "2024-01-11", products)
 
     stores = [
-        {"store_id": 1, "store_name": "Downtown Flagship", "region": "Northeast", "country": "USA", "opened_date": "2015-03-01"},
-        {"store_id": 2, "store_name": "Westside Mall", "region": "West", "country": "USA", "opened_date": "2017-06-15"},
+        {
+            "store_id": 1,
+            "store_name": "Downtown Flagship",
+            "region": "Northeast",
+            "country": "USA",
+            "opened_date": "2015-03-01",
+        },
+        {
+            "store_id": 2,
+            "store_name": "Westside Mall",
+            "region": "West",
+            "country": "USA",
+            "opened_date": "2017-06-15",
+        },
     ]
     _write(base, "sales_stores", "stores", "2024-01-11", stores)
 

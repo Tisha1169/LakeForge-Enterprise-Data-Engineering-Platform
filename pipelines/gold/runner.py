@@ -7,7 +7,9 @@ from __future__ import annotations
 
 from datetime import date
 
+from metadata.client import complete_run, start_run, upsert_freshness
 from monitoring.logging_config import get_logger
+from sqlalchemy import Engine
 
 from pipelines.gold.daily_sales_summary import build_daily_sales_summary
 from pipelines.gold.dim_customer import build_dim_customer
@@ -20,27 +22,43 @@ from pipelines.gold.writer import read_gold_table, write_gold_table
 logger = get_logger(__name__)
 
 
-def run_gold_build(batch_date: date) -> dict[str, int]:
+def _write_and_track(
+    metadata_engine: Engine | None, batch_date: date, table_name: str, rows: list[dict]
+) -> None:
+    """write_gold_table plus opt-in metadata tracking. Called after `rows`
+    has already been successfully built — build failures raise before this
+    is reached, so there's no failure path to record here, just a plain
+    start/complete pair (unlike ingestion's track_run, which wraps
+    in-progress work that can genuinely fail mid-flight)."""
+    write_gold_table(table_name, rows)
+    if metadata_engine is None:
+        return
+    run_id = start_run(metadata_engine, "gold_build", "gold", "gold", table_name, batch_date)
+    complete_run(metadata_engine, run_id, status="success", row_count=len(rows))
+    upsert_freshness(metadata_engine, "gold", table_name, batch_date, len(rows))
+
+
+def run_gold_build(batch_date: date, metadata_engine: Engine | None = None) -> dict[str, int]:
     dim_date_rows = read_gold_table("dim_date") or build_dim_date()
     if not read_gold_table("dim_date"):
-        write_gold_table("dim_date", dim_date_rows)
+        _write_and_track(metadata_engine, batch_date, "dim_date", dim_date_rows)
 
     dim_customer_rows = build_dim_customer(batch_date)
-    write_gold_table("dim_customer", dim_customer_rows)
+    _write_and_track(metadata_engine, batch_date, "dim_customer", dim_customer_rows)
 
     dim_product_rows = build_dim_product(batch_date)
-    write_gold_table("dim_product", dim_product_rows)
+    _write_and_track(metadata_engine, batch_date, "dim_product", dim_product_rows)
 
     dim_store_rows = build_dim_store(batch_date)
-    write_gold_table("dim_store", dim_store_rows)
+    _write_and_track(metadata_engine, batch_date, "dim_store", dim_store_rows)
 
     fact_sales_rows = build_fact_sales(
         batch_date, dim_customer_rows, dim_product_rows, dim_store_rows, dim_date_rows
     )
-    write_gold_table("fact_sales", fact_sales_rows)
+    _write_and_track(metadata_engine, batch_date, "fact_sales", fact_sales_rows)
 
     daily_summary_rows = build_daily_sales_summary(fact_sales_rows, dim_store_rows)
-    write_gold_table("daily_sales_summary", daily_summary_rows)
+    _write_and_track(metadata_engine, batch_date, "daily_sales_summary", daily_summary_rows)
 
     row_counts = {
         "dim_date": len(dim_date_rows),

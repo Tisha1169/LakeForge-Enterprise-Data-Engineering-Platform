@@ -10,8 +10,8 @@ from pipelines.storage import LakeLayer, ensure_bucket, get_bytes
 
 
 class _StubIngestion(BaseIngestion):
-    def __init__(self, config, batch_date=None, records=None, fail=False):
-        super().__init__(config, batch_date)
+    def __init__(self, config, batch_date=None, records=None, fail=False, metadata_engine=None):
+        super().__init__(config, batch_date, metadata_engine=metadata_engine)
         self._records = records or []
         self._fail = fail
 
@@ -62,3 +62,40 @@ def test_run_raises_and_reports_failure():
 
     with pytest.raises(RuntimeError, match="boom"):
         ingestion.run()
+
+
+@mock_aws
+def test_run_records_metadata_when_engine_provided():
+    from metadata.schema import create_all
+    from metadata.schema import to_connectable as _connectable
+    from sqlalchemy import create_engine
+
+    ensure_bucket(LakeLayer.LANDING)
+    engine = _connectable(create_engine("sqlite:///:memory:"))
+    create_all(engine)
+
+    config = SourceConfig(name="customers", source_type="api")
+    ingestion = _StubIngestion(
+        config,
+        batch_date=date(2024, 1, 1),
+        records=[{"customer_id": 1}],
+        metadata_engine=engine,
+    )
+    ingestion.run()
+
+    from metadata.client import get_freshness
+
+    freshness = get_freshness(engine, "ingestion", "customers")
+    assert freshness["last_row_count"] == 1
+
+
+@mock_aws
+def test_run_does_not_require_metadata_engine():
+    """Metadata tracking is opt-in — ingestion must work with no engine at all."""
+    ensure_bucket(LakeLayer.LANDING)
+    config = SourceConfig(name="customers", source_type="api")
+    ingestion = _StubIngestion(config, batch_date=date(2024, 1, 1), records=[{"customer_id": 1}])
+
+    result = ingestion.run()
+
+    assert result.status == "success"

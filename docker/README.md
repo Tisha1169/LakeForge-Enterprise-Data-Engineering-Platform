@@ -10,8 +10,11 @@ manual setup steps.
   synthetic seed data (deliberately includes some nulls/dirty rows for
   Silver-layer cleaning to handle later).
 - `postgres/init-warehouse/` — SQL run on first boot of `postgres-warehouse`:
-  extensions, plus the `gold` and `metadata` schemas reserved (tables land
-  in Phase 10/13 and Phase 15 respectively).
+  extensions, the `gold` schema (reserved — dbt/`pipelines/gold` write
+  Parquet to MinIO, not Postgres, so no tables land here), and the
+  `metadata` schema (`pipeline_runs`, `table_freshness`, `schema_versions`,
+  `table_ownership`, `lineage` — see `metadata/README.md`), seeded with
+  static ownership/lineage reference data.
 - `minio/init-buckets.sh` — idempotent script (run by the `minio-init`
   one-shot container) that creates the landing/bronze/silver/gold buckets.
 - `airflow/Dockerfile` — extends the official Airflow image with the

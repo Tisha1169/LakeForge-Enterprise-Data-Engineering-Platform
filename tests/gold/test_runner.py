@@ -97,3 +97,37 @@ def test_run_gold_build_produces_all_tables_end_to_end():
 
     fact_rows = read_gold_table("fact_sales")
     assert fact_rows[0]["extended_amount"] == 20.0
+
+
+@mock_aws
+def test_run_gold_build_records_metadata_when_engine_provided():
+    from metadata.client import get_freshness
+    from metadata.schema import create_all
+    from metadata.schema import to_connectable as _connectable
+    from sqlalchemy import create_engine
+
+    ensure_bucket(LakeLayer.GOLD)
+    engine = _connectable(create_engine("sqlite:///:memory:"))
+    create_all(engine)
+
+    batch_date = date(2024, 1, 1)
+    seed_silver(
+        "customers",
+        "customers",
+        batch_date,
+        [
+            {
+                "customer_id": 1,
+                "email": "a@example.com",
+                "first_name": "Alex",
+                "last_name": "Smith",
+                "loyalty_tier": "gold",
+            }
+        ],
+    )
+
+    run_gold_build(batch_date, metadata_engine=engine)
+
+    freshness = get_freshness(engine, "gold", "dim_customer")
+    assert freshness is not None
+    assert freshness["last_row_count"] == 1

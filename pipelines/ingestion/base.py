@@ -11,11 +11,14 @@ from __future__ import annotations
 import json
 from abc import ABC, abstractmethod
 from collections.abc import Iterator
+from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
 
 from config.sources import SourceConfig
+from metadata.client import track_run
 from monitoring.logging_config import get_logger
+from sqlalchemy import Engine
 
 from pipelines.storage import LakeLayer, ObjectKey, put_bytes
 
@@ -42,9 +45,18 @@ class BaseIngestion(ABC):
     config/sources/ and is used as the landing-zone `source` path segment.
     """
 
-    def __init__(self, config: SourceConfig, batch_date: date | None = None):
+    def __init__(
+        self,
+        config: SourceConfig,
+        batch_date: date | None = None,
+        metadata_engine: Engine | None = None,
+    ):
         self.config = config
         self.batch_date = batch_date or date.today()
+        # Opt-in: passing None (the default) skips metadata tracking
+        # entirely, so ingestion is fully usable/testable without a
+        # metadata database — Airflow tasks pass a real engine explicitly.
+        self.metadata_engine = metadata_engine
 
     @abstractmethod
     def extract(self) -> Iterator[dict]:
@@ -62,38 +74,45 @@ class BaseIngestion(ABC):
             "ingestion.start",
             extra={"context": {"source": self.config.name, "batch_date": str(self.batch_date)}},
         )
+        tracker = (
+            track_run(
+                self.metadata_engine,
+                pipeline_name=f"{self.config.name}_ingestion",
+                layer="ingestion",
+                source_name=self.config.name,
+                table_name=self.table_name,
+                batch_date=self.batch_date,
+            )
+            if self.metadata_engine is not None
+            else nullcontext(None)
+        )
         try:
-            records = list(self.extract())
-            landing_uri = self._land(records)
-            result = IngestionResult(
-                source_name=self.config.name,
-                status="success",
-                row_count=len(records),
-                started_at=started_at,
-                finished_at=datetime.now(UTC),
-                landing_uri=landing_uri,
-            )
-            logger.info(
-                "ingestion.success",
-                extra={
-                    "context": {
-                        "source": self.config.name,
-                        "row_count": result.row_count,
-                        "duration_seconds": result.duration_seconds,
-                        "landing_uri": landing_uri,
-                    }
-                },
-            )
-            return result
+            with tracker as run_handle:
+                records = list(self.extract())
+                landing_uri = self._land(records)
+                if run_handle is not None:
+                    run_handle.row_count = len(records)
+                result = IngestionResult(
+                    source_name=self.config.name,
+                    status="success",
+                    row_count=len(records),
+                    started_at=started_at,
+                    finished_at=datetime.now(UTC),
+                    landing_uri=landing_uri,
+                )
+                logger.info(
+                    "ingestion.success",
+                    extra={
+                        "context": {
+                            "source": self.config.name,
+                            "row_count": result.row_count,
+                            "duration_seconds": result.duration_seconds,
+                            "landing_uri": landing_uri,
+                        }
+                    },
+                )
+                return result
         except Exception as exc:  # noqa: BLE001 - deliberately broad: any failure is reported, not swallowed
-            result = IngestionResult(
-                source_name=self.config.name,
-                status="failed",
-                row_count=0,
-                started_at=started_at,
-                finished_at=datetime.now(UTC),
-                error=str(exc),
-            )
             logger.error(
                 "ingestion.failed",
                 extra={"context": {"source": self.config.name, "error": str(exc)}},
