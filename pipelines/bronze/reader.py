@@ -16,11 +16,17 @@ from datetime import date
 
 import pyarrow.parquet as pq
 
-from pipelines.storage import LakeLayer, ObjectKey, get_bytes
+from pipelines.storage import LakeLayer, ObjectKey, get_bytes, object_exists
 
 
 def read_bronze(source: str, table: str, batch_date: date) -> list[dict]:
+    """Returns [] rather than raising when the partition doesn't exist —
+    a source on a non-daily cadence (e.g. suppliers, `@weekly`) legitimately
+    has no Bronze data for most batch_dates, and Silver jobs run daily
+    regardless (see airflow/dags/silver_transform_dag.py)."""
     key = ObjectKey(source=source, table=table, filename="part-0.parquet", batch_date=batch_date)
+    if not object_exists(LakeLayer.BRONZE, key):
+        return []
     raw = get_bytes(LakeLayer.BRONZE, key)
     arrow_table = pq.read_table(io.BytesIO(raw))
 

@@ -27,7 +27,10 @@ itself, so it is independently unit-testable (see `tests/`).
   technical columns) rather than flattening fields into typed Arrow columns
   — schema-on-read, so a field that's an int in one row and a string in
   another (real schema drift) never breaks the write. `reader.py` parses
-  `payload` back into a flat dict for Silver/tooling to consume. Re-running
+  `payload` back into a flat dict for Silver/tooling to consume — returns
+  `[]` rather than raising when a partition doesn't exist yet (a source on
+  a non-daily cadence, e.g. suppliers `@weekly`, legitimately has no Bronze
+  data on most days, but Silver DAG tasks run daily regardless). Re-running
   for the same `(source, table, batch_date)` overwrites that partition
   (idempotent); no cleaning/casting/validation happens here — that's Silver.
 - `silver/` — `runner.py`'s `run_silver_job(job_name, batch_date)` looks up

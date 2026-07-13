@@ -73,3 +73,10 @@ def test_write_bronze_is_idempotent_overwrites_same_partition():
 
     assert result.row_count == 2
     assert len(read_bronze("customers", "customers", batch_date)) == 2
+
+
+@mock_aws
+def test_read_bronze_returns_empty_list_when_partition_does_not_exist():
+    ensure_bucket(LakeLayer.BRONZE)
+    # A non-daily source (e.g. suppliers, @weekly) has no Bronze data most days.
+    assert read_bronze("suppliers", "suppliers", date(2024, 1, 2)) == []

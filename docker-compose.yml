@@ -25,11 +25,20 @@ x-airflow-common: &airflow-common
     MINIO_SECURE: "false"
     CUSTOMER_API_BASE_URL: http://customer-api:8080
     LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    SPARK_MASTER_URL: spark://spark-master:7077
+    PYTHONPATH: /opt/airflow
+    # Airflow auto-registers AIRFLOW_CONN_<CONN_ID> env vars as Connections.
+    # Demonstrates the Connections concept via a real pre-flight DB check
+    # (bronze_ingestion_dag.py) rather than pipeline code using Airflow
+    # Connections generally — the rest of the platform reads DB credentials
+    # through config.settings for consistency with non-Airflow local runs.
+    AIRFLOW_CONN_OPENLAKE_SOURCE_DB: postgresql://${SOURCE_DB_USER:-openlake}:${SOURCE_DB_PASSWORD:-changeme}@postgres-source:5432/${SOURCE_DB_NAME:-openlake_source}
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/plugins:/opt/airflow/plugins
     - ./airflow/logs:/opt/airflow/logs
     - ./pipelines:/opt/airflow/pipelines
+    - ./spark:/opt/airflow/spark
     - ./config:/opt/airflow/config
     - ./metadata:/opt/airflow/metadata
     - ./monitoring:/opt/airflow/monitoring
