@@ -17,6 +17,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from monitoring.logging_config import get_logger
 from pipelines.bronze.reader import read_bronze
+from pipelines.silver.reader import read_silver
 from pipelines.storage import LakeLayer, ObjectKey, put_bytes
 from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
@@ -26,7 +27,14 @@ logger = get_logger(__name__)
 
 def get_spark_session(app_name: str) -> SparkSession:
     master = os.environ.get("SPARK_MASTER_URL", "local[*]")
-    return SparkSession.builder.appName(app_name).master(master).getOrCreate()
+    session = SparkSession.builder.appName(app_name).master(master).getOrCreate()
+    # Spark's default (200) is sized for cluster-scale shuffles; at this
+    # project's data volume it produces hundreds of near-empty shuffle
+    # tasks, all overhead. 4 is sized for local dev / this portfolio's data
+    # volume specifically — a real deployment would size this to executor
+    # core count and expected data volume, not hardcode it.
+    session.conf.set("spark.sql.shuffle.partitions", "4")
+    return session
 
 
 def _stringify(value: object) -> str | None:
@@ -49,6 +57,20 @@ def bronze_to_spark_df(spark: SparkSession, source: str, table: str, batch_date:
         )
         return spark.createDataFrame([], schema="_empty STRING")
     return spark.createDataFrame(stringified)
+
+
+def silver_to_spark_df(spark: SparkSession, source: str, table: str, batch_date: date) -> DataFrame:
+    """Loads an already-cleaned Silver table into Spark, e.g. to broadcast-
+    join it against another Silver/Bronze DataFrame. No stringify-everything
+    step here (unlike `bronze_to_spark_df`) — Silver's whole purpose is that
+    every column already has one consistent, cast type."""
+    records = read_silver(source, table, batch_date)
+    if not records:
+        logger.warning(
+            "silver.no_silver_records", extra={"context": {"source": source, "table": table}}
+        )
+        return spark.createDataFrame([], schema="_empty STRING")
+    return spark.createDataFrame(records)
 
 
 @dataclass

@@ -44,5 +44,42 @@ openjdk@17` on macOS, then `export JAVA_HOME=$(brew --prefix openjdk@17)`
 before running `pytest tests/silver/` outside Docker. Inside
 `docker compose`, the Spark containers already bundle their own JVM.
 
-Built out in Phase 9 (core logic) and Phase 12 (performance-tuning patterns:
-joins, window functions, partitioning, caching, broadcast joins).
+## Performance tuning (Phase 12)
+
+- **`spark.sql.shuffle.partitions` set to 4** in `get_spark_session` — the
+  200 default is sized for cluster-scale shuffles; at this project's data
+  volume it produces hundreds of near-empty shuffle tasks, all pure
+  overhead. 4 is sized for local dev/this portfolio's volume specifically —
+  a real deployment sizes this to executor core count and expected data
+  volume, not a hardcoded constant.
+- **Broadcast join** (`sales_order_lines_silver.py`) — its `clean()` now
+  takes a `valid_orders_df` and does
+  `order_lines.join(F.broadcast(orders.select("order_id")), on="order_id",
+  how="left_semi")`, dropping order lines whose `order_id` doesn't exist in
+  `orders` at all (a real data-quality gap the old NOT-NULL check didn't
+  catch). `orders` (one row per order) is far smaller than `order_lines`
+  (multiple rows per order) — broadcasting the small side to every executor
+  avoids shuffling the larger table across the network, the standard
+  fact/dimension-size-asymmetry case for a broadcast join. This makes
+  `sales_order_lines_silver` depend on `sales_orders_silver` having already
+  run for the same batch_date — reflected in
+  `airflow/dags/silver_transform_dag.py`'s task graph.
+- **`silver_to_spark_df`** (`jobs/common.py`) — loads an already-cleaned
+  Silver table into Spark for that broadcast join, without
+  `bronze_to_spark_df`'s stringify-everything step: Silver's whole point is
+  that every column already has one consistent, cast type, so there's
+  nothing to protect against there.
+- **Explicit repartition before the window function** — `order_lines` is
+  repartitioned by `order_line_id` immediately before `dedup_latest`
+  (`Window.partitionBy` on the same key), so Spark plans one shuffle
+  instead of two independent ones.
+- **Caching — deliberately not used.** No job here reuses a DataFrame across
+  more than one action (`clean()` runs once, `write_silver()` runs once);
+  `.cache()` only pays off when a DataFrame feeds ≥2 actions, so adding it
+  would just hold executor memory for zero benefit. Documenting *why not*
+  matters more here than sprinkling `.cache()` around to look sophisticated.
+- **Window functions** — already present since Phase 9 (`dedup_latest` is
+  `row_number() OVER (PARTITION BY ... ORDER BY ... DESC)`), now paired with
+  the repartitioning above for a complete before/after picture.
+
+Built out in Phase 9 (core logic) and Phase 12 (the above).

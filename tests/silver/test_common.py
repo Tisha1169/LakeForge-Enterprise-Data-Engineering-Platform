@@ -6,9 +6,10 @@ from moto import mock_aws
 pyspark = pytest.importorskip("pyspark")
 
 from pipelines.bronze.writer import write_bronze  # noqa: E402
+from pipelines.silver.reader import read_silver  # noqa: E402
 from pipelines.storage import LakeLayer, ObjectKey, ensure_bucket, put_bytes  # noqa: E402
 from pyspark.sql import SparkSession  # noqa: E402
-from spark.jobs.common import bronze_to_spark_df, write_silver  # noqa: E402
+from spark.jobs.common import bronze_to_spark_df, silver_to_spark_df, write_silver  # noqa: E402
 
 
 @pytest.fixture(scope="module")
@@ -62,3 +63,24 @@ def test_write_silver_round_trips_through_storage(spark):
 
     assert result.row_count == 2
     assert result.silver_uri.startswith("s3://")
+
+
+@mock_aws
+def test_silver_to_spark_df_preserves_types_without_stringifying(spark):
+    ensure_bucket(LakeLayer.SILVER)
+    batch_date = date(2024, 1, 1)
+    df = spark.createDataFrame([{"order_id": 100, "customer_id": 1}])
+    write_silver(df, "sales", "orders", batch_date)
+
+    loaded = silver_to_spark_df(spark, "sales", "orders", batch_date)
+
+    assert dict(loaded.dtypes)["order_id"] == "bigint"
+    assert loaded.collect()[0]["order_id"] == 100
+    assert read_silver("sales", "orders", batch_date)[0]["order_id"] == 100
+
+
+@mock_aws
+def test_silver_to_spark_df_returns_empty_when_no_data(spark):
+    ensure_bucket(LakeLayer.SILVER)
+    loaded = silver_to_spark_df(spark, "sales", "orders", date(2024, 1, 1))
+    assert loaded.count() == 0
