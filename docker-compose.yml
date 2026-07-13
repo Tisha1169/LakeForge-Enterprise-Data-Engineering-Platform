@@ -42,6 +42,7 @@ x-airflow-common: &airflow-common
     - ./config:/opt/airflow/config
     - ./metadata:/opt/airflow/metadata
     - ./monitoring:/opt/airflow/monitoring
+    - ./data_quality:/opt/airflow/data_quality
     - ./sample_data:/opt/airflow/sample_data
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on: &airflow-common-depends-on

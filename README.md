@@ -56,7 +56,7 @@ openlake/
 │   ├── bronze/             # Raw immutable landing logic
 │   ├── silver/             # Silver job orchestration
 │   └── gold/               # Gold star schema (Python/DuckDB build)
-├── great_expectations/    # Data quality suites
+├── data_quality/          # Great Expectations suites (not "great_expectations/" — collides with the pip package name)
 ├── metadata/              # Pipeline run / freshness / lineage tracking
 ├── monitoring/            # Logging config, health checks
 ├── config/                # YAML/TOML configuration (no secrets)
