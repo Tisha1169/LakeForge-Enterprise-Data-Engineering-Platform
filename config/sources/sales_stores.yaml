@@ -1,0 +1,10 @@
+name: sales_stores
+source_type: db
+description: Store master data extracted from the operational Sales Postgres DB (needed for the Gold dim_store dimension).
+schedule: "@daily"
+schema_name: sales
+table: stores
+retry:
+  max_attempts: 3
+  initial_backoff_seconds: 2.0
+  max_backoff_seconds: 20.0

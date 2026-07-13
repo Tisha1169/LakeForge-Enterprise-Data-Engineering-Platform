@@ -1,0 +1,10 @@
+name: sales_products
+source_type: db
+description: Product catalog extracted from the operational Sales Postgres DB (needed for the Gold dim_product dimension).
+schedule: "@daily"
+schema_name: sales
+table: products
+retry:
+  max_attempts: 3
+  initial_backoff_seconds: 2.0
+  max_backoff_seconds: 20.0

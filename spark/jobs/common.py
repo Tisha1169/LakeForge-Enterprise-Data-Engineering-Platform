@@ -122,9 +122,17 @@ def standardize_date(
 ) -> DataFrame:
     """Tries each format in order (first match wins) via `coalesce`, so a
     column with genuinely inconsistent date formats across rows (real source
-    data, see sample_data/) still parses instead of nulling out entirely."""
+    data, see sample_data/) still parses instead of nulling out entirely.
+
+    Uses `try_to_date` rather than `to_date`: under Spark's ANSI SQL mode
+    (the default since Spark 4.0 — this project's docker/spark/Dockerfile
+    pins 3.5, where ANSI defaults off, but the code shouldn't silently break
+    if that ever changes), `to_date` raises on a non-matching format instead
+    of returning NULL, which breaks this coalesce-first-match pattern
+    entirely. `try_to_date` returns NULL on a mismatch regardless of ANSI
+    mode, which is what "try the next format" actually requires."""
     out_col = out_col or col_name
-    parsed = [F.to_date(F.col(col_name), fmt) for fmt in formats]
+    parsed = [F.try_to_date(F.col(col_name), fmt) for fmt in formats]
     return df.withColumn(out_col, F.coalesce(*parsed))
 
 

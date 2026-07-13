@@ -11,8 +11,10 @@ from datetime import date
 from spark.jobs import (
     customers_silver,
     inventory_silver,
+    products_silver,
     sales_order_lines_silver,
     sales_silver,
+    stores_silver,
     suppliers_silver,
 )
 
@@ -20,6 +22,8 @@ _JOBS = {
     "customers": customers_silver,
     "sales_orders": sales_silver,
     "sales_order_lines": sales_order_lines_silver,
+    "products": products_silver,
+    "stores": stores_silver,
     "inventory": inventory_silver,
     "suppliers": suppliers_silver,
 }

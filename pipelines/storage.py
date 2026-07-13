@@ -108,11 +108,15 @@ def list_objects(layer: LakeLayer, prefix: str = "") -> list[str]:
 
 
 def object_exists(layer: LakeLayer, key: ObjectKey) -> bool:
+    """False both when the key is missing AND when the bucket itself hasn't
+    been created yet — callers like Gold's SCD2 merge (pipelines/gold/writer.py)
+    rely on this to mean "nothing here yet" on a table's very first run,
+    before that bucket's first object has ever been written."""
     client = get_client()
     try:
         client.head_object(Bucket=bucket_for(layer), Key=str(key))
         return True
     except ClientError as exc:
-        if exc.response["Error"]["Code"] in ("404", "NoSuchKey"):
+        if exc.response["Error"]["Code"] in ("404", "NoSuchKey", "NoSuchBucket"):
             return False
         raise

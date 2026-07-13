@@ -66,3 +66,9 @@ def test_object_exists_false_when_missing():
     ensure_bucket(LakeLayer.BRONZE)
     key = ObjectKey(source="sales", table="orders", filename="missing.parquet")
     assert not object_exists(LakeLayer.BRONZE, key)
+
+
+@mock_aws
+def test_object_exists_false_when_bucket_itself_does_not_exist_yet():
+    key = ObjectKey(source="gold", table="dim_customer", filename="part-0.parquet")
+    assert not object_exists(LakeLayer.BRONZE, key)

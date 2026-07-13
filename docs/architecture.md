@@ -46,7 +46,7 @@ Cross-cutting concerns that touch every layer: **Airflow orchestration**,
 | Bronze immutability | Append-only, never update/delete | Full audit trail, replay capability |
 | Orchestrator | Apache Airflow | Industry-standard DAG scheduling and dependency management |
 | Bronze -> Silver | PySpark | Row-level cleaning/dedup/normalization is engineering-heavy, benefits from a general-purpose distributed engine |
-| Silver -> Gold | dbt Core | Business logic is best expressed as testable, documented SQL that analysts can also read |
+| Silver -> Gold | DuckDB SQL now (Python, `pipelines/gold/`); dbt formalization in Phase 13 | Real star-schema/SCD2 logic that's fully testable with no JVM/Docker (DuckDB is embedded) — dbt requires a warehouse connection to genuinely execute against, which isn't available in every dev environment. dbt Core remains the target for testable/documented SQL that analysts can read; Phase 13 builds it as an actual dbt project (sources, snapshots for SCD2, tests, docs) on top of the same tables |
 | Warehouse | Postgres + DuckDB | Postgres for transactional-shaped queries and metadata; DuckDB for fast local OLAP on gold Parquet — zero cloud cost, patterns transfer directly to Snowflake/BigQuery/Redshift |
 | Metadata layer | Custom lightweight Postgres tables | Demonstrates understanding of lineage/freshness/ownership tracking without the operational overhead of a full catalog (Hive Metastore / Unity Catalog) — noted as a future upgrade |
 | Advanced table formats (Delta/Iceberg) | Deferred, optional advanced phase | ACID-on-object-storage adds real complexity; introduced only once the core medallion flow is solid |
