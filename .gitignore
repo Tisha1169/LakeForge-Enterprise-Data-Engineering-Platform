@@ -33,6 +33,7 @@ metastore_db/
 dbt/target/
 dbt/dbt_packages/
 dbt/logs/
+dbt/.user.yml
 
 # Great Expectations
 great_expectations/uncommitted/

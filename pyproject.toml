@@ -57,7 +57,7 @@ packages = ["pipelines", "metadata", "monitoring", "config", "spark"]
 [tool.ruff]
 line-length = 100
 target-version = "py313"
-src = ["pipelines", "metadata", "monitoring", "config", "spark", "tests"]
+src = ["pipelines", "metadata", "monitoring", "config", "spark", "scripts", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "C4"]

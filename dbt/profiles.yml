@@ -1,0 +1,25 @@
+openlake:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DBT_DUCKDB_PATH', 'openlake_dev.duckdb') }}"
+      extensions:
+        - httpfs
+      settings:
+        s3_endpoint: "{{ env_var('MINIO_ENDPOINT', 'localhost:9000') }}"
+        s3_access_key_id: "{{ env_var('MINIO_ACCESS_KEY', 'openlake') }}"
+        s3_secret_access_key: "{{ env_var('MINIO_SECRET_KEY', 'changeme123') }}"
+        s3_use_ssl: false
+        s3_url_style: path
+    prod:
+      type: duckdb
+      path: "{{ env_var('DBT_DUCKDB_PATH', '/opt/dbt/openlake.duckdb') }}"
+      extensions:
+        - httpfs
+      settings:
+        s3_endpoint: "{{ env_var('MINIO_ENDPOINT') }}"
+        s3_access_key_id: "{{ env_var('MINIO_ACCESS_KEY') }}"
+        s3_secret_access_key: "{{ env_var('MINIO_SECRET_KEY') }}"
+        s3_use_ssl: "{{ env_var('MINIO_SECURE', 'false') }}"
+        s3_url_style: path

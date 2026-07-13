@@ -55,11 +55,12 @@ openlake/
 │   ├── ingestion/          # Per-source ingestion modules (api/, db/, files/)
 │   ├── bronze/             # Raw immutable landing logic
 │   ├── silver/             # Silver job orchestration
-│   └── gold/               # Gold (dbt) orchestration
+│   └── gold/               # Gold star schema (Python/DuckDB build)
 ├── great_expectations/    # Data quality suites
 ├── metadata/              # Pipeline run / freshness / lineage tracking
 ├── monitoring/            # Logging config, health checks
 ├── config/                # YAML/TOML configuration (no secrets)
+├── scripts/               # Local-dev tooling (e.g. dbt fixture generator)
 ├── tests/                 # pytest suite, mirrors pipelines/
 ├── sample_data/           # Synthetic seed data for local dev
 ├── docs/                  # Architecture, developer, deployment, interview docs

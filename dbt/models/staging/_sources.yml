@@ -1,0 +1,42 @@
+version: 2
+
+sources:
+  - name: silver
+    description: >
+      Silver-layer Parquet tables written by pipelines/bronze + spark/jobs
+      (Phase 8/9). Each table's path is templated through OPENLAKE_SILVER_BASE
+      so local dev/testing can point at a local fixture directory instead of
+      real MinIO — production defaults to s3://openlake-silver.
+
+      Every Silver write is a FULL snapshot for that batch_date, not an
+      incremental delta (see pipelines/silver/reader.py) — so external_location
+      can't be a naive recursive glob over every day's Parquet file, or a
+      customer/order/etc. that appears in ten daily batches would appear ten
+      times. Each table's external_location uses DuckDB's Hive-partitioning
+      support (our paths are batch_date=<date>/part-0.parquet) plus `qualify
+      dense_rank() ... = 1` to filter down to only the most recent batch_date.
+
+      Originally written as `where batch_date = (select max(batch_date) from
+      read_parquet(...))` — that reads the same Parquet glob twice (once for
+      the outer query, once for the correlated MAX() subquery) and reliably
+      crashes DuckDB 1.10.1's statistics propagator with `INTERNAL Error:
+      Attempted to access index 7 within vector of size 7` (reproduced
+      directly against duckdb-python, independent of dbt — a real engine
+      bug, not a dbt or project-code issue). The `qualify` form reads the
+      glob once and produces identical results without the crash.
+    tables:
+      - name: customers
+        meta:
+          external_location: "(select * exclude (batch_date) from read_parquet('{{ env_var('OPENLAKE_SILVER_BASE', 's3://openlake-silver') }}/customers/customers/*/*.parquet', hive_partitioning=true) qualify dense_rank() over (order by batch_date desc) = 1)"
+      - name: orders
+        meta:
+          external_location: "(select * exclude (batch_date) from read_parquet('{{ env_var('OPENLAKE_SILVER_BASE', 's3://openlake-silver') }}/sales/orders/*/*.parquet', hive_partitioning=true) qualify dense_rank() over (order by batch_date desc) = 1)"
+      - name: order_lines
+        meta:
+          external_location: "(select * exclude (batch_date) from read_parquet('{{ env_var('OPENLAKE_SILVER_BASE', 's3://openlake-silver') }}/sales_order_lines/order_lines/*/*.parquet', hive_partitioning=true) qualify dense_rank() over (order by batch_date desc) = 1)"
+      - name: products
+        meta:
+          external_location: "(select * exclude (batch_date) from read_parquet('{{ env_var('OPENLAKE_SILVER_BASE', 's3://openlake-silver') }}/sales_products/products/*/*.parquet', hive_partitioning=true) qualify dense_rank() over (order by batch_date desc) = 1)"
+      - name: stores
+        meta:
+          external_location: "(select * exclude (batch_date) from read_parquet('{{ env_var('OPENLAKE_SILVER_BASE', 's3://openlake-silver') }}/sales_stores/stores/*/*.parquet', hive_partitioning=true) qualify dense_rank() over (order by batch_date desc) = 1)"

@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: Generated calendar dimension.
+    columns:
+      - name: date_key
+        tests: [unique, not_null]
+
+  - name: dim_customer
+    description: SCD Type 2 customer dimension, sourced from the dim_customer_snapshot.
+    columns:
+      - name: customer_sk
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [not_null]
+
+  - name: dim_product
+    columns:
+      - name: product_sk
+        tests: [unique, not_null]
+      - name: product_id
+        tests: [unique, not_null]
+
+  - name: dim_store
+    columns:
+      - name: store_sk
+        tests: [unique, not_null]
+      - name: store_id
+        tests: [unique, not_null]
+
+  - name: fact_sales
+    description: Grain -- one row per order line.
+    columns:
+      - name: order_line_id
+        tests: [unique, not_null]
+      - name: product_sk
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_product')
+                field: product_sk
+      - name: store_sk
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_store')
+                field: store_sk
+
+  - name: daily_sales_summary
+    columns:
+      - name: total_revenue
+        tests: [not_null]

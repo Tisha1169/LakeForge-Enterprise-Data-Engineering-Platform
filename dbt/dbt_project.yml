@@ -1,0 +1,19 @@
+name: openlake
+version: "1.0.0"
+config-version: 2
+
+profile: openlake
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+snapshot-paths: ["snapshots"]
+macro-paths: ["macros"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  openlake:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
